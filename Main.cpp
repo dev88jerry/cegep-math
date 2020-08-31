@@ -32,6 +32,9 @@ int main()
 	cout << "Enter la precision du numero finale" << endl;
 	cin >> perc;
 
+	//test input
+	cout << inS << " " << periode << " " << baseO << " " << baseF << " " << prec << endl;
+
 	system("PAUSE");
 
 	return 0;
