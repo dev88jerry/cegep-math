@@ -11,6 +11,8 @@ Base converision program
 #include <string>
 #include <cmath>
 #include <vector>
+#include <stack>
+#include <iomanip>
 #include "Fonctions.h"
 
 using namespace std;
@@ -58,40 +60,120 @@ int convCharInt(char c) {
 	return ret;
 }
 
+char convIntChar(int i) {
+	char ret;
+
+	if (i == 0)ret = '0';
+	else if (i == 1) ret = '1';
+	else if (i == 2) ret = '2';
+	else if (i == 3) ret = '3';
+	else if (i == 4) ret = '4';
+	else if (i == 5) ret = '5';
+	else if (i == 6) ret = '6';
+	else if (i == 7) ret = '7';
+	else if (i == 8) ret = '8';
+	else if (i == 9) ret = '9';
+	else if (i == 10) ret = 'a';
+	else if (i == 11) ret = 'b';
+	else if (i == 12) ret = 'c';
+	else if (i == 13) ret = 'd';
+	else if (i == 14) ret = 'd';
+	else if (i == 15) ret = 'f';
+	else if (i == 16) ret = 'g';
+	else if (i == 17) ret = 'h';
+	else if (i == 18) ret = 'i';
+	else if (i == 19) ret = 'j';
+	else if (i == 20) ret = 'k';
+	else if (i == 21) ret = 'l';
+	else if (i == 22) ret = 'm';
+	else if (i == 23) ret = 'n';
+	else if (i == 24) ret = 'o';
+	else if (i == 25) ret = 'p';
+	else if (i == 26) ret = 'q';
+	else if (i == 27) ret = 'r';
+	else if (i == 28) ret = 's';
+	else if (i == 29) ret = 't';
+	else if (i == 30) ret = 'u';
+	else if (i == 31) ret = 'v';
+	else if (i == 32) ret = 'w';
+	else if (i == 33) ret = 'x';
+	else if (i == 34) ret = 'y';
+	else if (i == 35) ret = 'z';
+
+	return ret;
+}
+
+
 int convB10W(vector <char> inpV, int baseOri) 
 {
 	int ret = 0;
 
 	for (int i = 0; i < inpV.size(); i++) {
-		char c = inpV.at(i);		
+		char c = inpV.at(i);
 		int con = convCharInt(c);
-		ret += (con * pow(baseOri, inpV.size() - 1 - i));
-		cout << ret << endl;
+		ret += (con * pow(baseOri, inpV.size() - 1 - i));		
 	}	
-	
-	/*
-	int j = 0;
-	vector<char>::reverse_iterator rit = inpV.rbegin();
-	for (; rit != inpV.rend(); rit++) {
-		*rit = j++;
-	}
 
-	for (vector<char>::iterator it = inpV.begin(); it != inpV.end(); it++) {
-		char c = *it;
-		cout << c << endl;
-		int con = convCharInt(c);
-		cout << con << endl;
-	}
+	return ret;
+}
+
+double convB10Deci(vector<char> inpV, int baseOri) {
+	double ret = 0.0;
 	
 	for (int i = 0; i < inpV.size(); i++) {
 		char c = inpV.at(i);
-		cout << c << endl;
 		int con = convCharInt(c);
-		cout << con << endl;
-		ret += con * pow(baseOri, i);		
-	}	
-	*/
+		ret += (con * pow(baseOri, (i + 1) * -1));
+	}
+	
 	return ret;
+}
+
+string convBaseN(const int base10Num, const int baseFin) {
+
+	string s;
+	stack<char> mod;
+	char c;
+	int modRes;
+	int divRes = base10Num;
+
+	while (divRes != 0) {
+		modRes = divRes % baseFin;
+		c = convIntChar(modRes);
+		mod.push(c);
+		divRes = divRes / baseFin;		
+	}
+
+	while (!mod.empty())
+	{
+		s += mod.top();
+		mod.pop();
+	}
+
+	return s;
+}
+
+string convDeciBaseN(const double base10Deci, const int baseFin, const int pres) {
+	string s;
+	double whole, fract, start;
+	cout << base10Deci << endl;
+	start = base10Deci;
+	char c;
+	
+	for (int i = 0; i < pres; i++) {
+		start *= baseFin * 1.0;
+		whole = floor(start);
+		fract = start - whole;
+		cout << fract << endl;		
+		int x = int (whole);
+		cout << whole << endl;
+		c = convIntChar(x);
+		cout << c << endl;
+		s += c;
+		start = fract;
+	}
+
+	return s;
 }
 
 int main()
@@ -102,6 +184,8 @@ int main()
 	int baseF;
 	int prec;
 	int base10whole;
+	string finOut;
+	double b10Deci;
 
 	cout << "Enter le numero de conversion: " << endl;
 	cin >> inS;
@@ -130,35 +214,87 @@ int main()
 
 	vector<char> whole;
 	vector<char> deci;
+	
 	if (sep != 0) {
-		whole.resize(v.size());
-		deci.resize(v.size());
-
 		for (int i = 0; i < sep; i++) {
-			whole.at(i) = v.at(i);
+			whole.push_back(v.at(i));
 		}
-		whole.shrink_to_fit();
+		for (int i = sep + 1; i < v.size(); i++) {
+			deci.push_back(v.at(i));
+		}
+	}
+	
+	//no decimal
+	if (baseO != 10 && sep == 0) {		
+		//input convert to b10
+		base10whole = convB10W(v, baseO);
+		if (baseF != 10) {
+			//base 10 to final base
+			finOut = convBaseN(base10whole, baseF);
+		}
+	}
+	else if (baseO != 10) {		
+		base10whole = convB10W(whole, baseO);		
+		b10Deci = convB10Deci(deci, baseO);
+		if (baseF != 10) {
+			//base 10 to final base
+			finOut = convBaseN(base10whole, baseF);
+			finOut += ",";
+			finOut += convDeciBaseN(b10Deci, baseF, prec);
+			
+		}
+		else {
+			double total = base10whole + b10Deci;
+			cout << total << endl;
+		}
+	}
+	else if(sep == 0){
+		int i = stoi(inS);
+		finOut = convBaseN(i, baseF);
+	}
+	else {
+		string s;
 		for (int i = 0; i < whole.size(); i++) {
-			cout << whole.at(i) << " ";
+			s += whole.at(i);
 		}
-		cout << endl;
-
-		for (int i = sep + 1, j = 0; i < v.size(); i++, j++) {
-			deci.at(j) = v.at(i);
-		}
-		deci.shrink_to_fit();
+		int w = stoi(s);
+		
+		string sd = "0.";
 		for (int i = 0; i < deci.size(); i++) {
-			cout << deci.at(i) << " ";
+			sd += deci.at(i);
 		}
-		cout << endl;
-	}
-	
-	if (baseO != 10 && sep == 0) {
+		double d = stod(sd);
 
-		base10whole = convB10W(v, baseO);		
+		finOut = convBaseN(w, baseF);
+		finOut += ".";
+		finOut += convDeciBaseN(d, baseF, prec);
+		cout << finOut << endl;
 	}
 	
-	
+	/*******************
+	Final print section
+	*/
+
+	if (baseF == 10 && sep == 0) {
+		if (prec == 0) {
+			cout << "Conversion de " << inS << " en base " << baseO << " est egale a " << base10whole << " en base 10" << endl;
+		}
+		else {
+			//todo -> place into string select # in ? to round.
+		}
+	}
+	else if (sep == 0) {
+		if (prec == 0) {
+			cout << "Conversion de " << inS << " en base " << baseO << " est egale a " << finOut << " en base " << baseF << endl;
+		}
+		else
+		{
+			//todo -> rounding
+		}
+	}
+	else if (baseF == 10) {
+
+	}
 
 	system("PAUSE");
 
