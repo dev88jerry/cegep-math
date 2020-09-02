@@ -13,7 +13,6 @@ Base converision program
 #include <vector>
 #include <stack>
 #include <iomanip>
-#include "Fonctions.h"
 
 using namespace std;
 
@@ -155,20 +154,16 @@ string convBaseN(const int base10Num, const int baseFin) {
 
 string convDeciBaseN(const double base10Deci, const int baseFin, const int pres) {
 	string s;
-	double whole, fract, start;
-	cout << base10Deci << endl;
+	double whole, fract, start;	
 	start = base10Deci;
 	char c;
 	
 	for (int i = 0; i < pres; i++) {
 		start *= baseFin * 1.0;
 		whole = floor(start);
-		fract = start - whole;
-		cout << fract << endl;		
-		int x = int (whole);
-		cout << whole << endl;
-		c = convIntChar(x);
-		cout << c << endl;
+		fract = start - whole;		
+		int x = int (whole);		
+		c = convIntChar(x);		
 		s += c;
 		start = fract;
 	}
@@ -199,7 +194,7 @@ int main()
 	cin >> prec;
 
 	//test input
-	cout << inS << " " << periode << " " << baseO << " " << baseF << " " << prec << endl;
+	//cout << inS << " " << periode << " " << baseO << " " << baseF << " " << prec << endl;
 
 	//place string to char
 	vector<char> v(inS.begin(), inS.end());
@@ -266,7 +261,7 @@ int main()
 		double d = stod(sd);
 
 		finOut = convBaseN(w, baseF);
-		finOut += ".";
+		finOut += ",";
 		finOut += convDeciBaseN(d, baseF, prec);
 		cout << finOut << endl;
 	}
