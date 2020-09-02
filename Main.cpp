@@ -102,8 +102,8 @@ char convIntChar(int i) {
 	return ret;
 }
 
-
-int convB10W(vector <char> inpV, int baseOri) 
+//convert whole to base 10
+int convB10W(vector<char> inpV, const int baseOri) 
 {
 	int ret = 0;
 
@@ -116,7 +116,8 @@ int convB10W(vector <char> inpV, int baseOri)
 	return ret;
 }
 
-double convB10Deci(vector<char> inpV, int baseOri) {
+//convert deci to base 10, no periode
+double convB10Deci(vector<char> inpV, const int baseOri) {
 	double ret = 0.0;
 	
 	for (int i = 0; i < inpV.size(); i++) {
@@ -128,6 +129,75 @@ double convB10Deci(vector<char> inpV, int baseOri) {
 	return ret;
 }
 
+//convert deci num with periode
+double convDeciPeri(vector<char> inpV, const int peri, const int baseOri) {
+	double ret = 0.0;
+	stack<char> s;
+	vector<char> v;
+	int dec;
+	int konst;
+	int per = 0;
+	//constant + a0 * baseO ^ per * -1 / 1 - baseO ^ periode * -1
+
+	//get a0 into stack
+	for (int i = 0; i < peri; i++) {
+		s.push(inpV.back());
+		inpV.pop_back();
+	}
+
+	//a0
+	while (!s.empty()) {
+		v.push_back(s.top());
+		s.pop();
+		per++;
+	}
+	dec = convB10W(v, baseOri);
+
+	//constant * baseO ^ size()*-1
+	/*
+	for (int i = 0; i < inpV.size(); i++) {
+		inpV.at(i);
+	}
+	*/
+	konst = convB10W(inpV, baseOri);
+	konst *= pow(baseOri, (inpV.size() * -1));
+
+
+	return ret;
+}
+
+/*
+check periode...
+count from last deci in
+vector<int> v;
+stack<int> s;
+v.push_back(5);
+v.push_back(1);
+v.push_back(2);
+v.push_back(3);
+v.push_back(4);
+v.push_back(5);
+v.push_back(6);
+
+
+for(int i=0;i<3;i++){
+s.push(v.back());
+v.pop_back();
+}
+//a0
+while(!s.empty()){
+cout<<s.top();
+s.pop();
+}
+cout<<endl;
+//const
+for(int i=0;i<v.size();i++){
+cout<<v.at(i);
+}
+cout << endl << v.size() << endl;
+*/
+
+//convert whole part base10 num to base N
 string convBaseN(const int base10Num, const int baseFin) {
 
 	string s;
@@ -152,6 +222,7 @@ string convBaseN(const int base10Num, const int baseFin) {
 	return s;
 }
 
+//convert deci part base10 num to base N
 string convDeciBaseN(const double base10Deci, const int baseFin, const int pres) {
 	string s;
 	double whole, fract, start;	
@@ -209,7 +280,7 @@ int main()
 
 	vector<char> whole;
 	vector<char> deci;
-	
+	//split into whole and decimal parts
 	if (sep != 0) {
 		for (int i = 0; i < sep; i++) {
 			whole.push_back(v.at(i));
@@ -218,8 +289,13 @@ int main()
 			deci.push_back(v.at(i));
 		}
 	}
+
+	if (periode != 0 && sep != 0 && baseO != 10) {
+		b10Deci = convDeciPeri(deci, periode, baseO);
+		baseO = 10;
+	}
 	
-	//no decimal
+	//no decimal & not base10
 	if (baseO != 10 && sep == 0) {		
 		//input convert to b10
 		base10whole = convB10W(v, baseO);
@@ -228,6 +304,7 @@ int main()
 			finOut = convBaseN(base10whole, baseF);
 		}
 	}
+	//decimal & not base10
 	else if (baseO != 10) {		
 		base10whole = convB10W(whole, baseO);		
 		b10Deci = convB10Deci(deci, baseO);
@@ -235,18 +312,19 @@ int main()
 			//base 10 to final base
 			finOut = convBaseN(base10whole, baseF);
 			finOut += ",";
-			finOut += convDeciBaseN(b10Deci, baseF, prec);
-			
+			finOut += convDeciBaseN(b10Deci, baseF, prec);			
 		}
 		else {
 			double total = base10whole + b10Deci;
 			cout << total << endl;
 		}
 	}
+	//no decimal & base 10
 	else if(sep == 0){
 		int i = stoi(inS);
 		finOut = convBaseN(i, baseF);
 	}
+	//decimal & base 10
 	else {
 		string s;
 		for (int i = 0; i < whole.size(); i++) {
@@ -266,6 +344,15 @@ int main()
 		cout << finOut << endl;
 	}
 	
+	/*
+	round part
+	calc prec+1 
+	if val at prec+1/baseF > 0.5 round up
+	else leave as is
+	*/
+
+
+
 	/*******************
 	Final print section
 	*/
@@ -285,6 +372,7 @@ int main()
 		else
 		{
 			//todo -> rounding
+			
 		}
 	}
 	else if (baseF == 10) {
