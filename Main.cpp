@@ -76,7 +76,7 @@ char convIntChar(int i) {
 	else if (i == 11) ret = 'b';
 	else if (i == 12) ret = 'c';
 	else if (i == 13) ret = 'd';
-	else if (i == 14) ret = 'd';
+	else if (i == 14) ret = 'e';
 	else if (i == 15) ret = 'f';
 	else if (i == 16) ret = 'g';
 	else if (i == 17) ret = 'h';
@@ -165,12 +165,9 @@ double convDeciPeri(vector<char> inpV, const int peri, const int baseOri) {
 
 	konst = convB10Deci(inpV, baseOri);
 	dec = specConv(v, baseOri, v.size());
-	//cout << konst << endl;
-	//cout << dec << endl;
+
 	ret = konst + (dec / (1.0 - pow(baseOri, (-1.0*peri))));
-	//cout << fixed;
-	//cout << setprecision(10);
-	//cout << ret << endl;
+
 	return ret;
 }
 
@@ -266,19 +263,23 @@ int main()
 			deci.push_back(v.at(i));
 		}
 	}
-
+	
+	//change periode to geometric formula and calc in base 10
 	if (periode != 0 && sep != 0) {
 		if (baseO != 10) {
 			b10Deci = convDeciPeri(deci, periode, baseO);
+			base10whole = convB10W(whole, baseO);
 			baseO = 10;
 		}
 		else {
+			base10whole = convB10W(whole, baseO);
 			b10Deci = convDeciPeri(deci, periode, baseO);
 		}
 	}
 	
-	//no decimal & not base10
-	if (baseO != 10 && sep == 0) {		
+	//final sort
+	//no decimal/peri & not base10
+	if (baseO != 10 && sep == 0 && periode == 0) {
 		//input convert to b10
 		base10whole = convB10W(v, baseO);
 		if (baseF != 10) {
@@ -286,28 +287,34 @@ int main()
 			finOut = convBaseN(base10whole, baseF);
 		}
 	}
-	//decimal & not base10
-	else if (baseO != 10) {		
-		base10whole = convB10W(whole, baseO);		
+	//decimal & no periode & not base10
+	else if (baseO != 10 && sep != 0 && periode == 0) {
+		base10whole = convB10W(whole, baseO);
 		b10Deci = convB10Deci(deci, baseO);
 		if (baseF != 10) {
 			//base 10 to final base
 			finOut = convBaseN(base10whole, baseF);
 			finOut += ",";
-			finOut += convDeciBaseN(b10Deci, baseF, prec);			
+			finOut += convDeciBaseN(b10Deci, baseF, prec);
+			
+			cout << finOut << endl;
 		}
 		else {
 			double total = base10whole + b10Deci;
+			cout << fixed;
+			cout << setprecision(prec);
 			cout << total << endl;
 		}
 	}
-	//no decimal & base 10
-	else if(sep == 0){
+	//no decimal & base 10 & no periode
+	else if(sep == 0 && baseO == 10 && periode == 0){
 		int i = stoi(inS);
 		finOut = convBaseN(i, baseF);
+		
+		cout << finOut << endl;
 	}
-	//decimal & base 10
-	else {
+	//decimal & base 10 & no periode
+	else if (baseO == 10 && sep != 0 && periode == 0) {
 		string s;
 		for (int i = 0; i < whole.size(); i++) {
 			s += whole.at(i);
@@ -323,6 +330,20 @@ int main()
 		finOut = convBaseN(w, baseF);
 		finOut += ",";
 		finOut += convDeciBaseN(d, baseF, prec);
+		
+		cout << finOut << endl;
+	}
+	//periode part
+	else {
+		if (base10whole == 0) {
+			finOut += "0,";
+		}
+		else {
+			finOut = convBaseN(base10whole, baseF);
+			finOut += ",";
+		}		
+		finOut += convDeciBaseN(b10Deci, baseF, prec);
+		
 		cout << finOut << endl;
 	}
 	
@@ -332,9 +353,7 @@ int main()
 	if val at prec+1/baseF > 0.5 round up
 	else leave as is
 	*/
-
-
-
+	
 	/*******************
 	Final print section
 	*/
