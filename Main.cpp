@@ -129,15 +129,26 @@ double convB10Deci(vector<char> inpV, const int baseOri) {
 	return ret;
 }
 
-//convert deci num with periode
+//special conv deci to base 10 with periode
+double specConv(vector<char> inpV, const int baseOri, const int pos) {
+	double ret = 0.0;
+
+	for (int i = 0; i < inpV.size(); i++) {
+		char c = inpV.at(i);
+		int con = convCharInt(c);
+		ret += (con * pow(baseOri, (i + pos) * -1));
+	}
+
+	return ret;
+}
+
+//convert deci num with periode to base 10
 double convDeciPeri(vector<char> inpV, const int peri, const int baseOri) {
 	double ret = 0.0;
 	stack<char> s;
 	vector<char> v;
-	int dec;
-	int konst;
-	int per = 0;
-	//constant + a0 * baseO ^ per * -1 / 1 - baseO ^ periode * -1
+	double dec;
+	double konst;
 
 	//get a0 into stack
 	for (int i = 0; i < peri; i++) {
@@ -149,53 +160,19 @@ double convDeciPeri(vector<char> inpV, const int peri, const int baseOri) {
 	while (!s.empty()) {
 		v.push_back(s.top());
 		s.pop();
-		per++;
+		
 	}
-	dec = convB10W(v, baseOri);
 
-	//constant * baseO ^ size()*-1
-	/*
-	for (int i = 0; i < inpV.size(); i++) {
-		inpV.at(i);
-	}
-	*/
-	konst = convB10W(inpV, baseOri);
-	konst *= pow(baseOri, (inpV.size() * -1));
-
-
+	konst = convB10Deci(inpV, baseOri);
+	dec = specConv(v, baseOri, v.size());
+	//cout << konst << endl;
+	//cout << dec << endl;
+	ret = konst + (dec / (1.0 - pow(baseOri, (-1.0*peri))));
+	//cout << fixed;
+	//cout << setprecision(10);
+	//cout << ret << endl;
 	return ret;
 }
-
-/*
-check periode...
-count from last deci in
-vector<int> v;
-stack<int> s;
-v.push_back(5);
-v.push_back(1);
-v.push_back(2);
-v.push_back(3);
-v.push_back(4);
-v.push_back(5);
-v.push_back(6);
-
-
-for(int i=0;i<3;i++){
-s.push(v.back());
-v.pop_back();
-}
-//a0
-while(!s.empty()){
-cout<<s.top();
-s.pop();
-}
-cout<<endl;
-//const
-for(int i=0;i<v.size();i++){
-cout<<v.at(i);
-}
-cout << endl << v.size() << endl;
-*/
 
 //convert whole part base10 num to base N
 string convBaseN(const int base10Num, const int baseFin) {
@@ -290,9 +267,14 @@ int main()
 		}
 	}
 
-	if (periode != 0 && sep != 0 && baseO != 10) {
-		b10Deci = convDeciPeri(deci, periode, baseO);
-		baseO = 10;
+	if (periode != 0 && sep != 0) {
+		if (baseO != 10) {
+			b10Deci = convDeciPeri(deci, periode, baseO);
+			baseO = 10;
+		}
+		else {
+			b10Deci = convDeciPeri(deci, periode, baseO);
+		}
 	}
 	
 	//no decimal & not base10
