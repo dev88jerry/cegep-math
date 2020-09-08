@@ -374,7 +374,7 @@ int main()
 		{
 			if (prec < 0) {
 				
-				int r = finOut.size() - (prec * -1);
+				int r = finOut.size() - (prec * -1) - 1;
 
 				char c = finOut.at(r);
 				int a = convCharInt(c);
