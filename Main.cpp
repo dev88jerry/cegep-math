@@ -372,13 +372,31 @@ int main()
 		}
 		else
 		{
-			//todo -> rounding
+			if (prec < 0) {
+				
+				int r = finOut.size() - (prec * -1);
+
+				char c = finOut.at(r);
+				int a = convCharInt(c);
+				
+				if (a > baseF / 2) {
+					a++;
+				}
+
+				c = convIntChar(a);
+				finOut.at(r) = c;
+
+				for (int i = r + 1; i < finOut.size(); i++) {
+					finOut.at(i) = '0';
+				}
+
+				cout << finOut << endl;
+
+			}
 			
 		}
 	}
-	else if (baseF == 10) {
 
-	}
 
 	system("PAUSE");
 
