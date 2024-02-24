@@ -1,0 +1,42 @@
+//working code for r^n
+
+#include <cstdio>
+
+int main(){	
+	int temp;
+	int numbers=7;
+	int a[numbers+1], upto = 11, temp2;
+	for( temp2 = 1 ; temp2 <= numbers; temp2++){
+		a[temp2]=1;
+	}
+	a[numbers]=0;
+	temp=numbers;
+	
+	int ret = 1;
+	
+	
+	while(1){
+		if(a[temp]==upto){
+			temp--;
+			if(temp==0)
+				break;
+		}
+		else{
+			a[temp]++;
+			while(temp<numbers){
+				temp++;
+				a[temp]=1;
+			}
+ 			
+ 			printf("%d. ", ret);
+			for( temp2 = 1 ; temp2 <= numbers; temp2++){
+				printf("%d ", a[temp2]);
+			}
+			printf("\n");
+			ret++;
+		}
+	}
+	
+	printf("\n On a trouver %d possibilite\n", ret);
+	return 0;
+}
